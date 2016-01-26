@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Command {
     String name() default "";
-    String[] permissions() default {};
+    String permission();
 }

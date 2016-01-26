@@ -19,7 +19,7 @@ public class ConsoleInputListener extends CommandHandler implements ConsoleComma
 
     private Scanner scanner;
     private boolean running = true;
-    private List<String> permissions = new ArrayList<>(Arrays.asList("*"));
+    private Permissions permissions = new Permissions(new ArrayList<>(Arrays.asList("*")));
 
     @Override
     public void start() {
@@ -49,7 +49,7 @@ public class ConsoleInputListener extends CommandHandler implements ConsoleComma
     }
 
     @Override
-    public List<String> getPermissions() {
+    public Permissions getPermissions() {
         return permissions;
     }
 
@@ -71,7 +71,7 @@ public class ConsoleInputListener extends CommandHandler implements ConsoleComma
         return true; //console can do everything
     }
 
-    @Command(name = "stop")
+    @Command(name = "stop", permission = "sh.iwmc.server.stop")
     public void stopCommand() {
         running = false;
     }

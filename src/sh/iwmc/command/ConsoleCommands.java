@@ -16,12 +16,12 @@ public class ConsoleCommands implements Logger {
         return CommandHandler.COMMAND_MARKER;
     }
 
-    @Command
+    @Command(permission = "sh.iwmc.server.version")
     public void version() {
         info("The server is running the Fern framework version " + Fern.getServer().getConfig().getString("server.version", "Unknown") + ".");
     }
 
-    @Command
+    @Command(permission = "sh.iwmc.server.administration.reloadconfig")
     public void reloadConfig() {
         info("Reloading configuration...");
         Fern.getServer().getConfig().reload();

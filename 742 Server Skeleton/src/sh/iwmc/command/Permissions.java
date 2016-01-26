@@ -10,7 +10,7 @@ import java.util.Optional;
 public class Permissions {
 
     private transient CommandSender owner;
-    private Tree<String> permissionsTree = new Tree<>("root");
+    private Tree<String> permissionsTree = new Tree<>("permissions");
 
     public Permissions(List<String> permissions) {
         /**
@@ -42,6 +42,50 @@ public class Permissions {
                 }
             }
         }
+    }
+
+    public void nodeToString(int indentation, Node<?> node, StringBuilder sb) {
+
+        String indent = "";
+        for(int i = 0; i < indentation; i++) {
+            indent += " ";
+        }
+        sb.append(indent).append("- ").append(node.getData()).append("\n");
+        for(Node child : node.getChildren()) {
+            nodeToString(indentation + 2, child, sb);
+        }
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        nodeToString(0, permissionsTree.getRoot(), sb);
+        return sb.toString();
+    }
+
+    public Tree<String> getPermissions() {
+        return permissionsTree;
+    }
+
+    public boolean hasPermission(String perm) {
+        String[] split = perm.split("\\.");
+
+        Node<String> base = permissionsTree.getRoot();
+        for (String element : split) {
+            boolean star = base.getChildren().stream().anyMatch(n -> n.getData().equals("*"));
+            if(star) {
+                return true;
+            }
+
+            Optional<Node<String>> node = base.getChildren().stream().filter(n -> n.getData().equals(element)).findAny();
+            if(node.isPresent()) {
+                base = node.get();
+                continue;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static class Node<T> {

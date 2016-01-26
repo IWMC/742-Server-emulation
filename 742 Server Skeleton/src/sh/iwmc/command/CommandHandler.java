@@ -90,7 +90,7 @@ public abstract class CommandHandler implements Logger {
     public abstract Result doCommand(Command annotation, CommandBean command, MethodWrapper wrapper);
 
     boolean hasPermission(Command annotation, CommandBean command) {
-        return true;
+        return command.getSender().getPermissions().hasPermission(annotation.permission());
     }
 
     private void scan() {
