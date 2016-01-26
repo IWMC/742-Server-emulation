@@ -1,12 +1,11 @@
 package sh.iwmc.command;
 
 import sh.iwmc.Fern;
-import sh.iwmc.command.annot.Command;
+import sh.iwmc.command.annotation.Command;
 import sh.iwmc.core.service.Service;
 import sh.iwmc.core.service.ServiceManifest;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,9 +55,9 @@ public class ConsoleInputListener extends CommandHandler implements ConsoleComma
 
 
     @Override
-    public Result doCommand(Command annotation, CommandBean command, Method method) {
+    public Result doCommand(Command annotation, CommandBean command, MethodWrapper wrapper) {
         try {
-            invoke(method);
+            invoke(wrapper);
             return Result.SUCCESS;
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();

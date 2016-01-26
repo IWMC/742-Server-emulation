@@ -1,9 +1,8 @@
 package sh.iwmc.command;
 
 import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 import sh.iwmc.Fern;
-import sh.iwmc.command.annot.Command;
+import sh.iwmc.command.annotation.Command;
 import sh.iwmc.logging.Logger;
 
 /**
@@ -28,4 +27,5 @@ public class ConsoleCommands implements Logger {
         Fern.getServer().getConfig().reload();
         info("Configuration reloaded");
     }
+
 }

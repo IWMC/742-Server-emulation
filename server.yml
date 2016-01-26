@@ -6,3 +6,4 @@ server:
   threading:
     # valid time units are ms, s and m --> milliseconds, seconds and minutes respectively.
     shutdown_wait: 5s
+

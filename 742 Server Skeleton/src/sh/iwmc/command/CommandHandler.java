@@ -2,7 +2,7 @@ package sh.iwmc.command;
 
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import sh.iwmc.command.annot.Command;
+import sh.iwmc.command.annotation.Command;
 import sh.iwmc.logging.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +24,6 @@ public abstract class CommandHandler implements Logger {
     private Map<Class, Object> ownerInstanceMap = new HashMap<>();
     private boolean needsScan = true;
     private List<Class> owners = new ArrayList<>();
-
 
 
     public CommandHandler(Class... owners) {
@@ -69,7 +68,7 @@ public abstract class CommandHandler implements Logger {
             }
             //check for permissions
             if (hasPermission(annot, command)) {
-                return doCommand(annot, command, resultingMethod);
+                return doCommand(annot, command, new MethodWrapper(resultingMethod));
             } else {
                 return Result.NO_PERMISSION;
             }
@@ -83,14 +82,16 @@ public abstract class CommandHandler implements Logger {
         return COMMAND_MARKER;
     }
 
-    public void invoke(Method m, Object... args) throws InvocationTargetException, IllegalAccessException {
-        Object ownerInstance = ownerInstanceMap.getOrDefault(methodClassLink.get(m), this);
-        m.invoke(ownerInstance, args);
+    public void invoke(MethodWrapper wrapper, Object... args) throws InvocationTargetException, IllegalAccessException {
+        Object ownerInstance = ownerInstanceMap.getOrDefault(methodClassLink.get(wrapper.method), this);
+        wrapper.method.invoke(ownerInstance, args);
     }
 
-    public abstract Result doCommand(sh.iwmc.command.annot.Command annotation, CommandBean command, Method method);
+    public abstract Result doCommand(Command annotation, CommandBean command, MethodWrapper wrapper);
 
-    abstract boolean hasPermission(sh.iwmc.command.annot.Command annotation, CommandBean command);
+    boolean hasPermission(Command annotation, CommandBean command) {
+        return true;
+    }
 
     private void scan() {
         needsScan = false;
@@ -109,7 +110,7 @@ public abstract class CommandHandler implements Logger {
                 annotLink.put(name.toLowerCase(), c);
                 methodClassLink.put(method, owner);
                 try {
-                    if(owner != this.getClass()) {
+                    if (owner != this.getClass()) {
                         ownerInstanceMap.put(owner, owner.newInstance());
                     } else {
                         ownerInstanceMap.put(owner, this);
@@ -123,5 +124,15 @@ public abstract class CommandHandler implements Logger {
 
     public enum Result {
         SUCCESS, NO_PERMISSION, FAILED;
+    }
+
+    /**
+     * Designed to prevent direct invocation of a command Method. It should be called using {@link CommandHandler#invoke(MethodWrapper, Object...)} instead.
+     */
+    public class MethodWrapper {
+        private final Method method;
+        public MethodWrapper(Method m) {
+            method = m;
+        }
     }
 }

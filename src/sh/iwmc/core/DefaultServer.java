@@ -122,7 +122,6 @@ public class DefaultServer implements Server, ServiceHandler, Logger {
 
         consoleInputListener = new ConsoleInputListener();
         registerService(consoleInputListener);
-
         info(startupMarker, "Server is online!");
     }
 
