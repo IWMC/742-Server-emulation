@@ -1,4 +1,4 @@
 # 742 Server Emulation
 
 ---
-Copyright 2016 iWantMyCode (format as described at http://choosealicense.com/licenses/no-license/)
+Copyright 2016 [iWantMyCode](http://iwmc.sh) (format as described at [Choose a license: no license](http://choosealicense.com/licenses/no-license/))
