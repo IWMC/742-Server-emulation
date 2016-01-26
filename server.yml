@@ -1,0 +1,8 @@
+server:
+  name: Fern
+  revision: 742
+  version: 1.0-alpha
+  cache: D:\RSPS\NetbeansProjects\Kainos 742 Server\data\kainoscache
+  threading:
+    # valid time units are ms, s and m --> milliseconds, seconds and minutes respectively.
+    shutdown_wait: 5s
