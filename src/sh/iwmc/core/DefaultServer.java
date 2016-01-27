@@ -23,8 +23,9 @@ import java.util.List;
 public class DefaultServer implements Server, ServiceHandler, Logger {
 
     private static final Marker startupMarker = MarkerManager.getMarker("STARTUP");
+    private static final Marker threadingMarker = MarkerManager.getMarker("THREADING");
     private List<Service> services = new ArrayList<>();
-    private boolean started;
+    private boolean started, starting;
     private Cache cache;
     private Configuration serverConfig;
     private ThreadingManager threadingManager;
@@ -35,30 +36,31 @@ public class DefaultServer implements Server, ServiceHandler, Logger {
     public void registerService(Service s) {
         if (!services.contains(s)) {
             services.add(s);
+        } else {
+            return;
         }
 
-        if (!s.hasStarted()) {
-            if (s.getClass().isAnnotationPresent(ServiceManifest.class)) {
-                ServiceManifest sm = s.getClass().getDeclaredAnnotation(ServiceManifest.class);
-                switch (sm.threadingType()) {
-                    case SYNCHRONOUS:
-                    default:
+        if (s.getClass().isAnnotationPresent(ServiceManifest.class)) {
+            ServiceManifest sm = s.getClass().getDeclaredAnnotation(ServiceManifest.class);
+            switch (sm.threadingType()) {
+                case SYNCHRONOUS:
+                default:
+                    s.start();
+                    break;
+                case ASYNCHRONOUS:
+                    if (getThreadingManager() != null) {
+                        debug(threadingMarker, "Delegating service \"" + sm.name() + "\" to thread pool");
+                        getThreadingManager().submit(s);
+                    } else {
+                        debug("Cannot delegate to thread pool because it does not yet exist! Starting " + s.getClass().getSimpleName() + " on main thread.");
                         s.start();
-                        break;
-                    case ASYNCHRONOUS:
-                        if (getThreadingManager() != null) {
-                            debug("Delegating service to thread pool");
-                            getThreadingManager().submit(s);
-                        } else {
-                            debug("Cannot delegate to thread pool because it does not yet exist! Starting " + s.getClass().getSimpleName() + " on main thread.");
-                            s.start();
-                        }
-                }
-            } else {
-                debug("Service " + s.getClass().getSimpleName() + " does not have a ServiceManifest");
-                s.start();
+                    }
             }
+        } else {
+            debug(startupMarker, "Service " + s.getClass().getSimpleName() + " does not have a ServiceManifest");
+            s.start();
         }
+
     }
 
     public <SERVICE> SERVICE getService(Class<SERVICE> serviceClass) {
@@ -109,6 +111,7 @@ public class DefaultServer implements Server, ServiceHandler, Logger {
         if (started) {
             return;
         }
+        starting = true;
         started = true;
         threadingManager = new DefaultThreadingManager();
         registerService(threadingManager);
@@ -120,13 +123,17 @@ public class DefaultServer implements Server, ServiceHandler, Logger {
         cache = new DefaultCache();
         registerService(cache);
 
-        consoleInputListener = new ConsoleInputListener();
-        registerService(consoleInputListener);
-        info(startupMarker, "Server is online!");
+        if(starting) {
+            consoleInputListener = new ConsoleInputListener();
+            registerService(consoleInputListener);
+            info(startupMarker, "Server is online!");
+        }
+        starting = false;
     }
 
     @Override
     public void stop() {
+        starting = false;
         new Thread(() -> {
             info("Stopping server...");
             services.forEach(s -> {

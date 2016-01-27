@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="742 Server Skeleton" />
     <orderEntry type="library" name="org.apache.logging.log4j:log4j-core:2.1" level="project" />
+    <orderEntry type="library" name="cachelib" level="project" />
   </component>
 </module>

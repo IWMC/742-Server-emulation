@@ -9,4 +9,6 @@ import java.nio.file.Path;
  */
 public interface Cache extends Service {
     Path getPath();
+    int getRevision();
+    int[] getSizeKeys();
 }

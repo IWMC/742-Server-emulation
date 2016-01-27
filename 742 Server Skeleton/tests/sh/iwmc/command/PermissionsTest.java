@@ -21,11 +21,12 @@ public class PermissionsTest {
                 "sh.iwmc.administration.ban",
                 "sh.iwmc.tools.*",
                 "sh.iwmc.combat.instantkill",
-                "org.bukkit.ban"
+                "some.plugin.commands.something",
+                "some.plugin.commands.somethingelse"
         ));
 
         assertTrue(permissions.hasPermission("sh.iwmc.administration.ban"));
-        assertTrue(permissions.hasPermission("sh.iwmc.tools.editor"));
+        assertTrue(permissions.hasPermission("sh.iwmc.tools.editors.npcspawning"));
         assertFalse(permissions.hasPermission("bitcode.not.a.permission"));
         System.out.println(permissions);
     }

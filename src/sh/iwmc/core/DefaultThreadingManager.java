@@ -22,11 +22,17 @@ public class DefaultThreadingManager implements ThreadingManager, Logger {
 
     @Override
     public <V> Future<V> submit(Runnable r, V result, ThreadingTarget target) {
+        if(getExecutorFor(target).isShutdown() ||getExecutorFor(target).isTerminated()) {
+            return null;
+        }
         return getExecutorFor(target).submit(r, result);
     }
 
     @Override
     public <V> Future<V> submit(Callable<V> c, ThreadingTarget target) {
+        if(getExecutorFor(target).isShutdown() ||getExecutorFor(target).isTerminated()) {
+            return null;
+        }
         return getExecutorFor(target).submit(c);
     }
 
